@@ -1,4 +1,4 @@
-My own implementations of some of the ML algorithms.
+# My own implementations of some of the ML algorithms.
 
-Available algorithms:
-* k-means: naive and kmeans++ initializations
+## Available algorithms**:
+* **k-means**: *naive* and *kmeans++* initializations
