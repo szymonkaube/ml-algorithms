@@ -7,28 +7,31 @@ class CustomKMeans():
     
     Attributes:
         k (int): Number of clusters.
+        init (str): The type of initialization.
         n_init (int): Number of times the algorithm will run with different centroid seeds.
         tol (float): Tolerance to declare convergence.
         n_iter (int): Maximum number of iterations for a single run.
     """
 
-    def __init__(self, k: int, n_init: int=10, tol: float=1e-3, n_iter: int=300):
+    def __init__(self, k: int, init: str, n_init: int=10, tol: float=1e-3, n_iter: int=300):
         """
         Initialize the K-means algorithm with specified parameters.
         
         Args:
             k (int): Number of clusters to form.
+            init (str): The type of cluster initialization: "kmeans++" or "naive".
             n_init (int, optional): Number of times the algorithm will run with different centroid seeds. Default is 10.
             tol (float, optional): Tolerance to declare convergence. Default is 1e-3.
             n_iter (int, optional): Maximum number of iterations for a single run. Default is 300.
         """
         self.k = k
+        self.init = init
         self.n_init = n_init
         self.tol = tol
         self.n_iter = n_iter
 
 
-    def __init_centroids(self, X: np.array):
+    def __naive_init_centroids(self, X: np.array):
         """
         Initialize centroids by randomly selecting k data points from the dataset.
         
@@ -40,6 +43,34 @@ class CustomKMeans():
         """
         centroids_idx = np.random.choice(len(X) - 1, size=self.k, replace=False)
         return X[centroids_idx, :]
+    
+
+    def __plusplus_init_centroids(self, X):
+        """
+        Initializes cluster centroids for k-means clustering using the k-means++ algorithm.
+
+        Args:
+            X (numpy.ndarray): The input data matrix of shape (n_samples, n_features).
+
+        Returns:
+            numpy.ndarray: An array of shape (k, n_features) containing the initialized centroids.
+        """
+        n_samples, n_features = X.shape
+        # Initialize first centroid
+        centroids = np.zeros((self.k, n_features))
+        centroid_idx = np.random.choice(n_samples)
+        centroids[0] = X[centroid_idx]
+        # Calculate the distances to the first centroid
+        distances = self.__calc_distance(X, centroids[0, None]).reshape(-1)
+        for i in range(1, self.k):
+            # Calculate the probabilities of being the new centroid
+            probs = distances / distances.sum()
+            # Randomly choose the new centroid according to the probabilities
+            new_centroid_idx = np.random.choice(n_samples, p=probs)
+            centroids[i] = X[new_centroid_idx]
+            # Set distances to be the minimal distance to all centroids
+            distances = np.minimum(distances, self.__calc_distance(X, centroids[i, None]).reshape(-1))
+        return centroids
     
 
     def __calc_distance(self, X: np.array, Y: np.array):
@@ -94,7 +125,10 @@ class CustomKMeans():
         # Run k-means n_init of times and choose the result with the best inertia
         for _ in range(self.n_init):
             # Initialize centroids
-            centroids = self.__init_centroids(X)
+            if self.init == "kmeans++":
+                centroids = self.__plusplus_init_centroids(X)
+            else:
+                centroids = self.__naive_init_centroids(X)
             change = np.inf
             n_iter_to_converge = 0
             while change > self.tol and n_iter_to_converge < self.n_iter:
