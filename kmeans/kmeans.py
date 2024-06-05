@@ -36,10 +36,10 @@ class CustomKMeans():
         Initialize centroids by randomly selecting k data points from the dataset.
         
         Args:
-            X (np.array): The dataset from which centroids are initialized.
+            X (numpy.ndarray): The dataset from which centroids are initialized.
         
         Returns:
-            np.array: An array of initial centroids.
+            numpy.ndarray: An array of initial centroids.
         """
         centroids_idx = np.random.choice(len(X) - 1, size=self.k, replace=False)
         return X[centroids_idx, :]
@@ -78,11 +78,11 @@ class CustomKMeans():
         Calculate the Euclidean distance between two sets of points.
         
         Args:
-            X (np.array): First set of points.
-            Y (np.array): Second set of points.
+            X (numpy.ndarray): First set of points.
+            Y (numpy.ndarray): Second set of points.
         
         Returns:
-            np.array: A distance matrix.
+            numpy.ndarray: A distance matrix.
         """
         X_norms = np.diag(X @ X.T)
         Y_norms = np.diag(Y @ Y.T)
@@ -94,9 +94,9 @@ class CustomKMeans():
         Calculate the inertia (within-cluster sum of squares) for the given clustering.
         
         Args:
-            X (np.array): The dataset.
-            centroids (np.array): Current centroids.
-            labels (np.array): Labels indicating the cluster assignment for each data point.
+            X (numpy.ndarray): The dataset.
+            centroids (numpy.ndarray): Current centroids.
+            labels (numpy.ndarray): Labels indicating the cluster assignment for each data point.
         
         Returns:
             float: The inertia value.
@@ -112,7 +112,7 @@ class CustomKMeans():
         Fit the K-means algorithm to the dataset X.
         
         Args:
-            X (np.array): The dataset to be clustered.
+            X (numpy.ndarray): The dataset to be clustered.
         
         Returns:
             CustomKMeans: The instance of the class with the best clustering result.
